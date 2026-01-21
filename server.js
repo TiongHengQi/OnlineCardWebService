@@ -32,12 +32,15 @@ app.get("/cards", (req, res) => {
     const sql = "SELECT * FROM cards";
     db.query(sql, (err, results) => {
         if (err) {
+            console.error("SQL error:", err); // <-- log the real error
             res.status(500).json({ message: "Error retrieving cards" });
         } else {
+            console.log("Cards retrieved:", results); // <-- check results
             res.json(results);
         }
     });
 });
+
 
 // ======================
 // CREATE – Add new card

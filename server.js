@@ -1,4 +1,33 @@
+const express = require("express");
+const mysql = require("mysql2");
+require("dotenv").config();
+
+const app = express();
+app.use(express.json());
+
+// ======================
+// Database connection
+// ======================
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
+});
+
+// Connect to DB
+db.connect((err) => {
+  if (err) {
+    console.error("Database connection failed:", err);
+  } else {
+    console.log("Connected to MySQL database");
+  }
+});
+
+// ======================
 // READ – View all cards
+// ======================
 app.get("/cards", (req, res) => {
   const sql = "SELECT * FROM cards";
   db.query(sql, (err, results) => {
@@ -11,7 +40,9 @@ app.get("/cards", (req, res) => {
   });
 });
 
+// ======================
 // CREATE – Add new card
+// ======================
 app.post("/cards", (req, res) => {
   const { card_name, card_pic } = req.body;
   const sql = "INSERT INTO cards (card_name, card_pic) VALUES (?, ?)";
@@ -25,7 +56,9 @@ app.post("/cards", (req, res) => {
   });
 });
 
+// ======================
 // UPDATE – Update card
+// ======================
 app.put("/cards/:id", (req, res) => {
   const { card_name, card_pic } = req.body;
   const cardId = req.params.id;
@@ -42,7 +75,9 @@ app.put("/cards/:id", (req, res) => {
   });
 });
 
+// ======================
 // DELETE – Delete card
+// ======================
 app.delete("/cards/:id", (req, res) => {
   const cardId = req.params.id;
   const sql = "DELETE FROM cards WHERE id = ?";
@@ -56,4 +91,12 @@ app.delete("/cards/:id", (req, res) => {
       res.json({ message: `Card ${cardId} deleted successfully` });
     }
   });
+});
+
+// ======================
+// Start server
+// ======================
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Card server running on port ${PORT}`);
 });
